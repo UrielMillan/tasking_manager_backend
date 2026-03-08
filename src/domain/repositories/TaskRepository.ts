@@ -2,8 +2,8 @@ import { Task } from "@domain/entities/Task.js";
 
 export interface TaskRepository {
     create(task: Task): Promise<void>;
-    findById(id: string): Promise<Task | null>;
+    findById(id: number): Promise<Task | null>;
     findAll(): Promise<Task[]>;
     update(task: Task): Promise<void>;
-    delete(id: string): Promise<void>;
+    delete(id: number): Promise<void>;
 }

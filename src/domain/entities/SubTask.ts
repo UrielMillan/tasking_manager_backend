@@ -30,6 +30,15 @@ export class SubTask {
         )
     }
 
+    static fromPrimitives(data: {
+        id: number, 
+        title: string, 
+        description: string, 
+        status: SubTaskStatus
+    }) {
+        return new SubTask(data.id, data.title, data.description, data.status)
+    }
+
     private ensureIsNotFinalizedOrCanceled() {
         if(this.status === SubTaskStatus.CANCEL || this.status === SubTaskStatus.COMPLETE) {
             throw new SubTaskCannotModifyFinalizedOrCanceledError()
@@ -72,4 +81,5 @@ export class SubTask {
             status: this.status
         }
     }
+
 }

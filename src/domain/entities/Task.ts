@@ -27,6 +27,29 @@ export class Task {
         )
     }
 
+    static fromPrimitives(data: {
+        id: number, 
+        title: string, 
+        description: string, 
+        subtasks: Array<{
+            id: number,
+            title: string,
+            description: string,
+            status: SubTaskStatus
+        }>,
+        createAt: Date,
+        updateAt: Date
+    }) {
+        return new Task(
+            data.id,
+            data.title,
+            data.description,
+            data.subtasks.map((i) => SubTask.fromPrimitives(i)),
+            data.createAt,
+            data.updateAt
+         )
+     }
+
     private touch(){
         this.updateAt = new Date()
     }
