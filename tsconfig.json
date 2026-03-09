@@ -23,6 +23,7 @@
       "@shared/*" : ["./src/shared/*"],
       "@infrastructure/*" : ["./src/infrastructure/*"],
       "@application/*" : ["./src/application/*"],
+      "@presentation/*" : ["./src/presentation/*"]
     }
   },
   "include": ["src/**/*"],

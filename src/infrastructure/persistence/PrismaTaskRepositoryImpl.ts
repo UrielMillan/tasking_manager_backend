@@ -79,10 +79,10 @@ export class PrismaTaskRepositoryImpl implements TaskRepository {
 
     async update(task: Task): Promise<void> {
         try {
-            const {id, title, description} = task.toPrimitives()
+            const {id, title, description, updateAt} = task.toPrimitives()
             await this._client.task.update({
                 where: {id},
-                data: {title, description}
+                data: {title, description, updatedAt: updateAt}
             })
         }catch(error){
             throw error
