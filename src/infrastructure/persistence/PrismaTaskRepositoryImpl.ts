@@ -36,8 +36,8 @@ export class PrismaTaskRepositoryImpl implements TaskRepository {
                 title: result.title,
                 description: result.description,
                 subtasks,
-                createAt: result.createdAt,
-                updateAt: result.updatedAt
+                createdAt: result.createdAt,
+                updatedAt: result.updatedAt
             })
 
             return task
@@ -61,13 +61,13 @@ export class PrismaTaskRepositoryImpl implements TaskRepository {
                     status: subTask.status as SubTaskStatus
                 }))
 
-                tasks.concat(Task.fromPrimitives({
+                tasks.push(Task.fromPrimitives({
                     id: task.id,
                     title: task.title,
                     description: task.description,
                     subtasks: subTasks,
-                    createAt: task.createdAt,
-                    updateAt: task.updatedAt
+                    createdAt: task.createdAt,
+                    updatedAt: task.updatedAt
                 }))
             })
 
@@ -92,6 +92,33 @@ export class PrismaTaskRepositoryImpl implements TaskRepository {
     async delete(id: number): Promise<void> {
         try {
             await this._client.task.delete({where: {id}})
+        }catch(error){
+            throw error
+        }
+    }
+
+    async addSubTask(task: Task): Promise<void> {
+        try{
+           const subtask = task.getSubTask(0)
+           const {title, description} = subtask.toPrimitives()
+           await this._client.subtask.create({data: {
+                title,
+                description,
+                taskId: task.id
+           }})
+        }catch(error){
+            throw error
+        }
+    }
+
+    async updateSubTask(task: Task, subTaskId: number): Promise<void> {
+        try {
+            const subtask = task.getSubTask(subTaskId)
+            const {title, description} = subtask.toPrimitives()
+            await this._client.subtask.update({
+                where: {id: subTaskId},
+                data: {title, description}
+            })
         }catch(error){
             throw error
         }

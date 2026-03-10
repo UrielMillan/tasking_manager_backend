@@ -6,4 +6,6 @@ export interface TaskRepository {
     findAll(): Promise<Task[]>;
     update(task: Task): Promise<void>;
     delete(id: number): Promise<void>;
+    addSubTask(task: Task): Promise<void>;
+    updateSubTask(task: Task, subtaskId: number): Promise<void>;
 }

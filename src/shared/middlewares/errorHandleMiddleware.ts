@@ -8,6 +8,9 @@ export default function errorHandleMiddleware(
     res: Response,
     next: NextFunction
 ){
+
+    console.error(error);
+
     if(error instanceof ZodError) {
         return res.status(400).json({
             code: "VALIDATION_ERROR",

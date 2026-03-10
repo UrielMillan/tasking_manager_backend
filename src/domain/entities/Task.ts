@@ -9,8 +9,8 @@ export class Task {
         private title: string,
         private description: string,
         private subtasks: Array<SubTask>,
-        private createAt: Date,
-        private updateAt: Date,
+        private createdAt: Date,
+        private updatedAt: Date,
     ){}
 
     static create(title: string, description: string) {
@@ -37,21 +37,21 @@ export class Task {
             description: string,
             status: SubTaskStatus
         }>,
-        createAt: Date,
-        updateAt: Date
+        createdAt: Date,
+        updatedAt: Date
     }) {
         return new Task(
             data.id,
             data.title,
             data.description,
             data.subtasks.map((i) => SubTask.fromPrimitives(i)),
-            data.createAt,
-            data.updateAt
+            data.createdAt,
+            data.updatedAt
          )
      }
 
     private touch(){
-        this.updateAt = new Date()
+        this.updatedAt = new Date()
     }
 
     getSubTask(id: number) {
@@ -111,6 +111,9 @@ export class Task {
         this.touch()
     }
 
+    getSubTasks() {
+        return this.subtasks
+    }
 
     toPrimitives() {
        return {
@@ -118,8 +121,8 @@ export class Task {
             title: this.title,
             description: this.description,
             subTasks: this.subtasks.map((i) => i.toPrimitives()),
-            createAt: this.createAt,
-            updateAt: this.updateAt
+            createAt: this.createdAt,
+            updateAt: this.updatedAt
        }
     }
 }
