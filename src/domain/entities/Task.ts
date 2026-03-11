@@ -121,8 +121,8 @@ export class Task {
             title: this.title,
             description: this.description,
             subTasks: this.subtasks.map((i) => i.toPrimitives()),
-            createAt: this.createdAt,
-            updateAt: this.updatedAt
+            createdAt: this.createdAt,
+            updatedAt: this.updatedAt
        }
     }
 }

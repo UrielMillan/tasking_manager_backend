@@ -8,18 +8,50 @@ export class PrismaTaskRepositoryImpl implements TaskRepository {
         private readonly _client: PrismaClient
     ) {}
 
-    async create(task: Task): Promise<void> {
+    async save(task: Task): Promise<void> {
         try{
-            const {title, description} = task.toPrimitives()
-            await this._client.task.create({
-                data: {title, description}
+            const {id ,title, description, subTasks, createdAt, updatedAt} = task.toPrimitives()
+            const deleteTasksId = subTasks.map((item) => item.id).filter((i) => i !== 0)
+
+            await this._client.$transaction(async (tx) => {
+                await tx.task.upsert({
+                    where: {id},
+                    update: {title, description, createdAt, updatedAt},
+                    create: {title, description, createdAt, updatedAt},
+                })
+
+                await tx.subtask.deleteMany({
+                    where: {
+                        taskId: id,
+                        id: {notIn: deleteTasksId}
+                    }
+                })
+
+                const subTaskUpsertPromise = subTasks.map((item) => {
+                    return tx.subtask.upsert({
+                        where: {id: item.id || 0},
+                        create: {
+                            taskId: id,
+                            title: item.title,
+                            description: item.description,
+                            status: item.status
+                        },
+                        update: {
+                            title: item.title,
+                            description: item.description,
+                            status: item.status
+                        }
+                    })
+                })
+
+                await Promise.all(subTaskUpsertPromise)
             })
         }catch(error){
             throw error
         }
     }
 
-    async findById(id: number): Promise<Task | null> {
+    async find(id: number): Promise<Task | null> {
         try {
             const result = await this._client.task.findUnique({where: {id}, include:{subtasks: true}})
             if(!result) return null
@@ -77,18 +109,7 @@ export class PrismaTaskRepositoryImpl implements TaskRepository {
         }
     }
 
-    async update(task: Task): Promise<void> {
-        try {
-            const {id, title, description, updateAt} = task.toPrimitives()
-            await this._client.task.update({
-                where: {id},
-                data: {title, description, updatedAt: updateAt}
-            })
-        }catch(error){
-            throw error
-        }
-    }
-
+    
     async delete(id: number): Promise<void> {
         try {
             await this._client.task.delete({where: {id}})
@@ -96,32 +117,4 @@ export class PrismaTaskRepositoryImpl implements TaskRepository {
             throw error
         }
     }
-
-    async addSubTask(task: Task): Promise<void> {
-        try{
-           const subtask = task.getSubTask(0)
-           const {title, description} = subtask.toPrimitives()
-           await this._client.subtask.create({data: {
-                title,
-                description,
-                taskId: task.id
-           }})
-        }catch(error){
-            throw error
-        }
-    }
-
-    async updateSubTask(task: Task, subTaskId: number): Promise<void> {
-        try {
-            const subtask = task.getSubTask(subTaskId)
-            const {title, description} = subtask.toPrimitives()
-            await this._client.subtask.update({
-                where: {id: subTaskId},
-                data: {title, description}
-            })
-        }catch(error){
-            throw error
-        }
-    }
-
 }

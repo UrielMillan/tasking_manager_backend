@@ -1,5 +1,6 @@
 import { CreateSubTaskUseCase } from "@application/useCases/CreateSubTaskUseCase.js";
 import { CreateTaskUseCase } from "@application/useCases/CreateTaskUseCase.js";
+import { DeleteSubTaskUseCase } from "@application/useCases/DeleteSubTaskUseCase.js";
 import { FindManyTaskUseCase } from "@application/useCases/FindManyTaskUseCase.js";
 import { FindTaskUseCase } from "@application/useCases/FindTaskUseCase.js";
 import { UpdateSubTaskUseCase } from "@application/useCases/UpdateSubTaskUseCase.js";
@@ -18,7 +19,8 @@ export class TaskController {
         private readonly _createTask: CreateTaskUseCase,
         private readonly _updateTask: UpdateTaskUseCase,
         private readonly _createSubTask: CreateSubTaskUseCase,
-        private readonly _updateSubTask: UpdateSubTaskUseCase
+        private readonly _updateSubTask: UpdateSubTaskUseCase,
+        private readonly _deleteSubTask: DeleteSubTaskUseCase,
     ){}
 
     find = async (req: Request<{id: number}>, res: Response, next: NextFunction) => {
@@ -89,5 +91,14 @@ export class TaskController {
         }catch(err) {
             next(err)
         }
+    }
+
+    deleteSubTask = async(req: Request<{taskId: number, subTaskId: number}>,  res: Response, next: NextFunction) => {
+        const {taskId, subTaskId} = req.params
+        await this._deleteSubTask.execute({ 
+            taskId: Number(taskId),
+            subTaskId: Number(subTaskId)
+        })
+        return res.status(200).json({message: "subtask deleted"})
     }
 }

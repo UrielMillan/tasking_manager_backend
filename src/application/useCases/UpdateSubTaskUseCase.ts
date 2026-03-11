@@ -15,12 +15,13 @@ export class UpdateSubTaskUseCase implements UseCase<UpdateSubTaskRequest, void>
     ){}
 
     async execute(input: UpdateSubTaskRequest): Promise<void> {
-        const task = await this._repository.findById(input.taskId)
+        const task = await this._repository.find(input.taskId)
         if(!task) throw new TaskNotFoundError()
         
         const subTask = task.getSubTask(input.subTaskId)
         task.changeSubTaskTitle(input.subTaskId, input?.title ?? subTask.toPrimitives().title)
         task.changeSubTaskDescription(input.subTaskId ,input?.description ?? subTask.toPrimitives().description)
-        await this._repository.updateSubTask(task, input.subTaskId)
+        
+        await this._repository.save(task)
     }
 }

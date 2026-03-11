@@ -13,8 +13,8 @@ export class TaskMapper {
             title: data.title,
             description: data.description,
             subTasks: SubTaskMapper.toMany(input.getSubTasks()),
-            createdAt: data.createAt,
-            updatedAt: data.updateAt
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt
         }
     }
 

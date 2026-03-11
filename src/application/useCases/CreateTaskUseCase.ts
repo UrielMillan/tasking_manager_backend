@@ -14,6 +14,6 @@ export class CreateTaskUseCase implements UseCase<CreateTaskRequest, void> {
 
     async execute(input: CreateTaskRequest): Promise<void> {
         const task = Task.create(input.title, input.description);
-        await this._repository.create(task);        
+        await this._repository.save(task);        
     }
 }

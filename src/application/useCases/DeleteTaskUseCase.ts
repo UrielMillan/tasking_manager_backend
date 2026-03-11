@@ -7,7 +7,7 @@ export class DeleteTaskUseCase implements UseCase<number, void> {
     ){}
 
     async execute(input: number): Promise<void> {
-       const task = await this._repository.findById(input);
+       const task = await this._repository.find(input);
        if(!task) throw new Error("Task not found");
        
        this._repository.delete(input);

@@ -11,7 +11,7 @@ export class FindTaskUseCase implements UseCase<number, TaskDto> {
     ){}
     
     async execute(input: number): Promise<TaskDto> {
-        const task = await this._repository.findById(input);
+        const task = await this._repository.find(input);
         if(!task) throw new TaskNotFoundError();
         
         return TaskMapper.toSingle(task);
