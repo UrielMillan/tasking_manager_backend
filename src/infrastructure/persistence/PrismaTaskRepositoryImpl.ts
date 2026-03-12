@@ -2,9 +2,12 @@ import { SubTaskStatus } from "@domain/entities/SubTask.js";
 import { Task } from "@domain/entities/Task.js";
 import { TaskRepository } from "@domain/repositories/TaskRepository.js";
 import { PrismaClient } from "@prisma/client";
+import {inject, injectable} from "tsyringe";
 
+@injectable()
 export class PrismaTaskRepositoryImpl implements TaskRepository {
     constructor(
+        @inject(PrismaClient)
         private readonly _client: PrismaClient
     ) {}
 
@@ -63,7 +66,7 @@ export class PrismaTaskRepositoryImpl implements TaskRepository {
                 status: i.status as SubTaskStatus
             }))
 
-            const task = Task.fromPrimitives({
+             return  Task.fromPrimitives({
                 id: result.id,
                 title: result.title,
                 description: result.description,
@@ -72,7 +75,6 @@ export class PrismaTaskRepositoryImpl implements TaskRepository {
                 updatedAt: result.updatedAt
             })
 
-            return task
         }catch(error){
             throw error
         }
@@ -109,7 +111,7 @@ export class PrismaTaskRepositoryImpl implements TaskRepository {
         }
     }
 
-    
+
     async delete(id: number): Promise<void> {
         try {
             await this._client.task.delete({where: {id}})

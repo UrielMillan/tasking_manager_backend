@@ -2,6 +2,8 @@ import {UseCase} from "@shared/application/UseCase.js";
 import {SubTaskStatus} from "@domain/entities/SubTask.js";
 import {TaskRepository} from "@domain/repositories/TaskRepository.js";
 import {TaskNotFoundError} from "@domain/errors/TaskNotFoundError.js";
+import {inject, injectable} from "tsyringe";
+import {TOKENS} from "@infrastructure/di/tokens.js";
 
 type UpdateSubTaskStatusRequest = {
     taskId: number,
@@ -9,9 +11,10 @@ type UpdateSubTaskStatusRequest = {
     status: SubTaskStatus
 }
 
+@injectable()
 export class UpdateSubTaskStatusUseCase implements UseCase<UpdateSubTaskStatusRequest, void> {
     constructor(
-        private readonly _repository: TaskRepository
+        @inject(TOKENS.TASK_REPOSITORY) private readonly _repository: TaskRepository
     ){}
 
     async execute(input: UpdateSubTaskStatusRequest): Promise<void> {

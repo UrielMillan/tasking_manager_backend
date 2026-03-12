@@ -1,6 +1,8 @@
 import { TaskNotFoundError } from "@domain/errors/TaskNotFoundError.js";
 import { TaskRepository } from "@domain/repositories/TaskRepository.js";
 import { UseCase } from "@shared/application/UseCase.js";
+import {inject, injectable} from "tsyringe";
+import {TOKENS} from "@infrastructure/di/tokens.js";
 
 
 type DeleteSubTaskRequest = {
@@ -8,9 +10,10 @@ type DeleteSubTaskRequest = {
     subTaskId: number
 }
 
+@injectable()
 export class DeleteSubTaskUseCase implements UseCase<DeleteSubTaskRequest, void>{
     constructor(
-        private readonly _repository: TaskRepository
+        @inject(TOKENS.TASK_REPOSITORY) private readonly _repository: TaskRepository
     ){}
 
     async execute(input: DeleteSubTaskRequest): Promise<void> {
