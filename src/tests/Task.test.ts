@@ -86,8 +86,9 @@ describe("Task Aggregate", () => {
         it("Should change SubTask status successfully", () => {
             const task = Task.create("title", "description")
             const id = task.addSubTask("Subtask 1", "Description")
-            task.changeSubTaskStatus(id, SubTaskStatus.COMPLETE)
-            expect(task.getSubTaskStatus(id)).toBe(SubTaskStatus.COMPLETE)
+            const subTask = task.getSubTask(id)
+            subTask.changeStatus(SubTaskStatus.COMPLETE)
+            expect(subTask.getStatus()).toBe(SubTaskStatus.COMPLETE)
         })
 
         it("Should throw SubTaskCannotModifyFinalizedOrCanceledError when trying to change status of completed SubTask", () => {
