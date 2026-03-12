@@ -10,6 +10,11 @@ import { CreateTaskRequest, CreateTaskSchema } from "@presentation/schemas/Creat
 import { UpdateSubTaskRequest, UpdateSubTaskSchema } from "@presentation/schemas/UpdateSubTaskSchema.js";
 import { UpdateTaskRequest, UpdateTaskSchema } from "@presentation/schemas/UpdateTaskSchema.js";
 import type { Request, Response, NextFunction } from "express";
+import {UpdateSubTaskStatusUseCase} from "@application/useCases/UpdateSubTaskStatusUseCase.js";
+import {
+    UpdateSubTaskStatusRequest,
+    UpdateSubTaskStatusSchema
+} from "@presentation/schemas/UpdateSubTaskStatusSchema.js";
 
 
 export class TaskController {
@@ -21,6 +26,7 @@ export class TaskController {
         private readonly _createSubTask: CreateSubTaskUseCase,
         private readonly _updateSubTask: UpdateSubTaskUseCase,
         private readonly _deleteSubTask: DeleteSubTaskUseCase,
+        private readonly _updateSubTaskStatus: UpdateSubTaskStatusUseCase
     ){}
 
     find = async (req: Request<{id: number}>, res: Response, next: NextFunction) => {
@@ -40,7 +46,7 @@ export class TaskController {
             return res.status(200).json(tasks);
         }catch(err){
             next(err);
-        }   
+        }
     }
 
     create = async(req: Request<any, any, CreateTaskRequest>, res: Response, next: NextFunction) => {
@@ -95,10 +101,21 @@ export class TaskController {
 
     deleteSubTask = async(req: Request<{taskId: number, subTaskId: number}>,  res: Response, next: NextFunction) => {
         const {taskId, subTaskId} = req.params
-        await this._deleteSubTask.execute({ 
+        await this._deleteSubTask.execute({
             taskId: Number(taskId),
             subTaskId: Number(subTaskId)
         })
         return res.status(200).json({message: "subtask deleted"})
+    }
+
+    updateSubTaskStatus = async (req: Request<{taskId: number, subTaskId: number}, any, UpdateSubTaskStatusRequest>, res: Response, next: NextFunction) => {
+        const {taskId, subTaskId} = req.params
+        const validation = UpdateSubTaskStatusSchema.parse(req.body)
+        await this._updateSubTaskStatus.execute({
+            taskId: Number(taskId),
+            subTaskId: Number(subTaskId),
+            status: validation.status
+        })
+        return res.status(200).json({message: "subtask status updated"})
     }
 }
