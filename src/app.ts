@@ -1,6 +1,3 @@
-
-
-
 import 'reflect-metadata'
 import {createExpressServer, useContainer} from "routing-controllers";
 import {container} from "tsyringe";

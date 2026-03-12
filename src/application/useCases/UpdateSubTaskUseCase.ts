@@ -22,9 +22,9 @@ export class UpdateSubTaskUseCase implements UseCase<UpdateSubTaskRequest, void>
         if(!task) throw new TaskNotFoundError()
 
         const subTask = task.getSubTask(input.subTaskId)
-        task.changeSubTaskTitle(input.subTaskId, input?.title ?? subTask.toPrimitives().title)
-        task.changeSubTaskDescription(input.subTaskId ,input?.description ?? subTask.toPrimitives().description)
-
+        const subTaskData = subTask.toPrimitives()
+        subTask.changeTitle(input?.title ?? subTaskData.title)
+        subTask.changeDescription(input?.description ?? subTaskData.description)
         await this._repository.save(task)
     }
 }

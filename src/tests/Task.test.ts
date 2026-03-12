@@ -49,36 +49,38 @@ describe("Task Aggregate", () => {
     describe("Update", () => {
         it("Should update Task title and updateAt timestamp when changing title", async() => {
             const task = Task.create("title", "description")
-            const initialDate = task.toPrimitives().updateAt.getTime()
+            const initialDate = task.toPrimitives().updatedAt.getTime()
 
             await new Promise(resolve => setTimeout(resolve, 10))
 
             task.changeTitle("new Title")
-            const finalUpdate = task.toPrimitives().updateAt.getTime()
+            const finalUpdate = task.toPrimitives().updatedAt.getTime()
             expect(finalUpdate).toBeGreaterThan(initialDate)
         })
 
         it("Should update Task description and updateAt timestamp when changing description", async() => {
             const task = Task.create("title", "description")
-            const initialDate = task.toPrimitives().updateAt.getTime()
+            const initialDate = task.toPrimitives().updatedAt.getTime()
 
             await new Promise(resolve => setTimeout(resolve, 10))
 
             task.changeDescription("new description")
-            const finalUpdate = task.toPrimitives().updateAt.getTime()
+            const finalUpdate = task.toPrimitives().updatedAt.getTime()
             expect(finalUpdate).toBeGreaterThan(initialDate)
         })
 
         it("Should throw SubTaskTitleEmptyError when changing SubTask title to empty", () => {
             const task = Task.create("title", "description")
             const id = task.addSubTask("Subtask 1", "Description")
-            expect(() =>  task.changeSubTaskTitle(id, "")).toThrow(SubTaskTitleEmptyError)
+            const subTask = task.getSubTask(id)
+            expect(() => subTask.changeTitle("")).toThrow(SubTaskTitleEmptyError)
         })
 
         it("Should throw SubTaskDescriptionEmptyError when changing SubTask description to empty", () => {
             const task = Task.create("title", "description")
             const id = task.addSubTask("Subtask 1", "Description")
-            expect(() => task.changeSubTaskDescription(id, "")).toThrow(SubTaskDescriptionEmptyError)
+            const subTask = task.getSubTask(id)
+            expect(() => subTask.changeDescription("")).toThrow(SubTaskDescriptionEmptyError)
         })
 
         it("Should change SubTask status successfully", () => {
@@ -91,8 +93,9 @@ describe("Task Aggregate", () => {
         it("Should throw SubTaskCannotModifyFinalizedOrCanceledError when trying to change status of completed SubTask", () => {
             const task = Task.create("title", "description")
             const id = task.addSubTask("Subtask 1", "Description")
-            task.changeSubTaskStatus(id, SubTaskStatus.COMPLETE)
-            expect(() => task.changeSubTaskStatus(id, SubTaskStatus.CANCEL)).toThrow(SubTaskCannotModifyFinalizedOrCanceledError)
+            const subTask = task.getSubTask(id)
+            subTask.changeStatus(SubTaskStatus.COMPLETE)
+            expect(() => subTask.changeStatus(SubTaskStatus.CANCEL)).toThrow(SubTaskCannotModifyFinalizedOrCanceledError)
         })
     })
 
@@ -103,7 +106,7 @@ describe("Task Aggregate", () => {
             const task = Task.create(title, description)
             const id = task.addSubTask("Subtask 1", "Description")
             task.deleteSubTask(id)
-            expect(task.toPrimitives().subTasks).toHaveLength(0)
+            expect(task.getSubTasks()).toHaveLength(0)
         })
 
         it("Should throw SubTaskNotFoundError when trying to delete non-existent SubTask", () => {
@@ -114,7 +117,8 @@ describe("Task Aggregate", () => {
         it("Should throw SubTaskCannotDeleteCompletedError when trying to delete completed SubTask", () => {
             const task = Task.create("title", "description")
             const id = task.addSubTask("Subtask 1", "Description")
-            task.changeSubTaskStatus(id, SubTaskStatus.COMPLETE)
+            const subTask = task.getSubTask(id)
+            subTask.changeStatus(SubTaskStatus.COMPLETE)
             expect(() => task.deleteSubTask(id)).toThrow(SubTaskCannotDeleteCompletedError)
         })
     })

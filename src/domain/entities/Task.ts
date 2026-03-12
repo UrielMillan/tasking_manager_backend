@@ -28,9 +28,9 @@ export class Task {
     }
 
     static fromPrimitives(data: {
-        id: number, 
-        title: string, 
-        description: string, 
+        id: number,
+        title: string,
+        description: string,
         subtasks: Array<{
             id: number,
             title: string,
@@ -88,23 +88,42 @@ export class Task {
         this.touch()
     }
 
+    /**
+     * @deprecated use getSubTask instead of this method
+     * @param id
+     * @param title
+     */
     changeSubTaskTitle(id: number, title: string){
         const subTask = this.getSubTask(id)
         subTask.changeTitle(title)
         this.touch()
     }
 
+    /**
+     * @deprecated use getSubTask instead of this method
+     * @param id
+     * @param description
+     */
     changeSubTaskDescription(id: number, description: string) {
         const subTask = this.getSubTask(id)
         subTask.changeDescription(description)
         this.touch()
     }
 
+    /**
+     * @deprecated use getSubTask instead of this method
+     * @param id
+     */
     getSubTaskStatus(id: number) {
         const subTask = this.getSubTask(id)
         return subTask.getStatus()
     }
 
+    /**
+     * @deprecated use getSubTask instead of this method
+     * @param id
+     * @param status
+     */
     changeSubTaskStatus(id: number, status: SubTaskStatus) {
         const subTask = this.getSubTask(id)
         subTask.changeStatus(status)
