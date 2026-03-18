@@ -2,12 +2,17 @@ import {ExpressErrorMiddlewareInterface, Middleware} from "routing-controllers";
 import { BaseError } from "@shared/errors/BaseError.js";
 import { ZodError } from "zod";
 import type { NextFunction, Request, Response } from "express";
+import {inject, injectable} from "tsyringe";
+import {TOKENS} from "@infrastructure/di/tokens.js";
+import {Logger} from "@shared/application/Logger.js"
 
+@injectable()
 @Middleware({ type: 'after' })
 export class ErrorHandlerMiddleware implements ExpressErrorMiddlewareInterface {
-    error(error: unknown, request: Request, response: Response, next: NextFunction) {
+    constructor(@inject(TOKENS.LOGGER) private readonly _logger: Logger) {}
 
-        console.error(error);
+    error(error: unknown, request: Request, response: Response, next: NextFunction) {
+        this._logger.error(`Error ${request.method}`, error)
 
         if(error instanceof ZodError) {
             return response.status(400).json({

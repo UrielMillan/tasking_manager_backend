@@ -3,16 +3,19 @@ import { Task } from "@domain/entities/Task.js";
 import { TaskRepository } from "@domain/repositories/TaskRepository.js";
 import { PrismaClient } from "@prisma/client";
 import {inject, injectable} from "tsyringe";
+import {TOKENS} from "@infrastructure/di/tokens.js";
+import {Logger} from "@shared/application/Logger.js";
 
 @injectable()
 export class PrismaTaskRepositoryImpl implements TaskRepository {
     constructor(
-        @inject(PrismaClient)
-        private readonly _client: PrismaClient
+        @inject(PrismaClient) private readonly _client: PrismaClient,
+        @inject(TOKENS.LOGGER) private readonly _logger: Logger
     ) {}
 
     async save(task: Task): Promise<void> {
         try{
+            this._logger.info("Saving task", {id: task.id})
             const {id ,title, description, subTasks, createdAt, updatedAt} = task.toPrimitives()
             const deleteTasksId = subTasks.map((item) => item.id).filter((i) => i !== 0)
 
@@ -46,7 +49,6 @@ export class PrismaTaskRepositoryImpl implements TaskRepository {
                         }
                     })
                 })
-
                 await Promise.all(subTaskUpsertPromise)
             })
         }catch(error){
@@ -56,6 +58,7 @@ export class PrismaTaskRepositoryImpl implements TaskRepository {
 
     async find(id: number): Promise<Task | null> {
         try {
+            this._logger.info("Finding task", {id})
             const result = await this._client.task.findUnique({where: {id}, include:{subtasks: true}})
             if(!result) return null
 
@@ -83,6 +86,7 @@ export class PrismaTaskRepositoryImpl implements TaskRepository {
 
     async findAll(): Promise<Task[]> {
         try {
+            this._logger.info("Finding all tasks")
             const tasks:Array<Task> = []
             const result = await this._client.task.findMany({include: {subtasks: true}})
 
@@ -114,6 +118,7 @@ export class PrismaTaskRepositoryImpl implements TaskRepository {
 
     async delete(id: number): Promise<void> {
         try {
+            this._logger.info("Deleting task", {id})
             await this._client.task.delete({where: {id}})
         }catch(error){
             throw error

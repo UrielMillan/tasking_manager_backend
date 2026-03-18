@@ -61,21 +61,32 @@ export class TaskController {
     }
 
     @Post("/")
-    async create (@Body() body: CreateTaskRequest, @Res() res){
+    async create (
+        @Body() body: CreateTaskRequest,
+        @Res() res
+    ){
         const validation = CreateTaskSchema.parse(body);
         await this._createTask.execute(validation);
         return res.status(201).json({ message: "Task created successfully" });
     }
 
     @Put("/:id")
-    async update(@Param('id') id: number, @Body body: UpdateTaskRequest, @Res res){
+    async update(
+        @Param('id') id: number,
+        @Body() body: UpdateTaskRequest,
+        @Res() res
+    ){
         const validation = UpdateTaskSchema.parse(body);
         await this._updateTask.execute({id: Number(id), ...validation});
         return res.status(200).json({ message: "Task updated successfully" });
     }
 
     @Post("/:id/subtask")
-    async createSubTask(@Param('id') id: number, @Body body: CreateSubTaskRequest, @Res() res){
+    async createSubTask(
+        @Param('id') id: number,
+        @Body() body: CreateSubTaskRequest,
+        @Res() res
+    ){
         const {title, description} = CreateSubTaskSchema.parse(body);
         await this._createSubTask.execute({taskId: Number(id), title, description})
         return res.status(200).json({message: "subtask created"})
@@ -86,7 +97,7 @@ export class TaskController {
         @Param("taskId") taskId: number,
         @Param("subTaskId") subTaskId: number,
         @Body() body: UpdateSubTaskRequest,
-        @Res res
+        @Res() res
     ){
         const {title, description} = UpdateSubTaskSchema.parse(body)
         await this._updateSubTask.execute({
@@ -102,7 +113,7 @@ export class TaskController {
     async deleteSubTask(
         @Param("taskId") taskId: number,
         @Param("subTaskId") subTaskId: number,
-        @Res res
+        @Res() res
     ) {
         await this._deleteSubTask.execute({
             taskId: Number(taskId),
@@ -116,7 +127,7 @@ export class TaskController {
         @Param("taskId") taskId: number,
         @Param("subTaskId") subTaskId: number,
         @Body() body: UpdateSubTaskStatusRequest,
-        @Res res
+        @Res() res
     ){
         const validation = UpdateSubTaskStatusSchema.parse(body)
         await this._updateSubTaskStatus.execute({
